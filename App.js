@@ -10,10 +10,25 @@ import Weather from './Weather';
 
 export default class App extends Component {
   state = {
-    isLoaded: true
+    isLoaded: false,
+    error: null
   };
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        this.setState({
+          isLoaded: true
+        });
+      },
+      error => {
+        this.setState({
+          error: error
+        });
+      }
+    );
+  }
   render() {
-    const { isLoaded } = this.state;
+    const { isLoaded, error } = this.state;
     return (
       <View style={styles.container}>
         <StatusBar hidden={true} />
@@ -21,6 +36,7 @@ export default class App extends Component {
           <Weather />
         ) : (
           <View style={styles.loading}>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <ActivityIndicator />
             <Text style={styles.loadingText}>Getting the weather</Text>
           </View>
@@ -39,6 +55,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FDF6AA',
     justifyContent: 'flex-end'
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 18,
+    alignSelf: 'center',
+    marginBottom: 24
   },
   loadingText: {
     fontSize: 36,
